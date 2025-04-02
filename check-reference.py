@@ -1,75 +1,81 @@
 #!/usr/bin/env python3
-import os
-import json
 import re
-from bs4 import BeautifulSoup
+import os
+import sys
+import json
 
-def check_unit_references():
-    print("Verifying Unit 2 References...")
+def check_references():
+    print("Verifying Unit 3 References...")
     
     # Read the index.html file
-    with open('index.html', 'r', encoding='utf-8') as f:
-        html_content = f.read()
+    try:
+        with open('index.html', 'r', encoding='utf-8') as file:
+            content = file.read()
+    except Exception as e:
+        print(f"Error reading index.html: {e}")
+        return False
     
-    # Check for any remaining "Unit 1" references that should have been updated
-    unit1_references = re.findall(r'Unit 1', html_content)
-    if unit1_references:
-        print(f"WARNING: Found {len(unit1_references)} references to 'Unit 1' that might need updating")
+    # Check for title
+    title_pattern = r'<title>([^<]+)</title>'
+    title_match = re.search(title_pattern, content)
+    if title_match:
+        title = title_match.group(1)
+        if "Unit 3" not in title:
+            print(f"❌ Title does not reference Unit 3: {title}")
+            return False
+        else:
+            print(f"✅ Title references Unit 3: {title}")
+    
+    # Check for exam weight percentage
+    exam_weight_pattern = r'Unit 3 represents (\d+-\d+)% of the AP Statistics Exam'
+    exam_weight_match = re.search(exam_weight_pattern, content)
+    if exam_weight_match:
+        exam_weight = exam_weight_match.group(1)
+        if exam_weight != "12-15":
+            print(f"❌ Incorrect exam weight: {exam_weight}%")
+            return False
+        else:
+            print(f"✅ Correct exam weight: {exam_weight}%")
     else:
-        print("✓ No remaining 'Unit 1' references found")
+        print("❌ Could not find exam weight percentage")
+        return False
     
-    # Check that exam weight is correctly set to 5-7%
-    exam_weight_pattern = r'Unit 2 represents (\d+-\d+)% of the AP Statistics Exam'
-    exam_weight_match = re.search(exam_weight_pattern, html_content)
+    # Check PDF file paths
+    pdf_path_pattern = r'"pdfs/unit(\d+)/.*\.pdf"'
+    pdf_paths = re.findall(pdf_path_pattern, content)
+    incorrect_paths = [path for path in pdf_paths if path != "3"]
     
-    if exam_weight_match and exam_weight_match.group(1) == '5-7':
-        print("✓ Exam weight correctly set to 5-7%")
+    if incorrect_paths:
+        print(f"❌ Found {len(incorrect_paths)} PDF paths that don't reference Unit 3")
+        return False
     else:
-        print("WARNING: Exam weight not correctly set to 5-7%")
+        print(f"✅ All PDF paths reference Unit 3 ({len(pdf_paths)} paths checked)")
     
-    # Parse the HTML to extract the pdfFiles array 
-    soup = BeautifulSoup(html_content, 'html.parser')
+    # Check topic IDs in pdfFiles array
+    topic_id_pattern = r'id:\s*"(\d+)-'
+    topic_ids = re.findall(topic_id_pattern, content)
+    incorrect_ids = [topic_id for topic_id in topic_ids if topic_id != "3"]
     
-    # Find the script tag containing the pdfFiles array
-    script_tags = soup.find_all('script')
-    pdf_files_script = None
-    
-    for tag in script_tags:
-        if tag.string and 'pdfFiles =' in tag.string:
-            pdf_files_script = tag.string
-            break
-    
-    if not pdf_files_script:
-        print("ERROR: Could not find pdfFiles array in the HTML")
-        return
-    
-    # Check PDF paths in the pdfFiles array
-    expected_pdfs = []
-    for i in range(2, 10):  # Topics 2.2 to 2.9
-        expected_pdfs.append(f"pdfs/unit2/2.{i}_quiz.pdf")
-        expected_pdfs.append(f"pdfs/unit2/2.{i}_answers.pdf")
-    
-    # Add progress check PDFs
-    expected_pdfs.extend([
-        "pdfs/unit2/unit2_pc_frq_quiz.pdf",
-        "pdfs/unit2/unit2_pc_frq_answers.pdf",
-        "pdfs/unit2/unit2_pc_mcq_parta_answers.pdf",
-        "pdfs/unit2/unit2_pc_mcq_partb_answers.pdf"
-    ])
-    
-    missing_pdfs = []
-    for expected_pdf in expected_pdfs:
-        if expected_pdf not in html_content:
-            missing_pdfs.append(expected_pdf)
-    
-    if missing_pdfs:
-        print(f"WARNING: {len(missing_pdfs)} expected PDF paths not found in HTML:")
-        for pdf in missing_pdfs:
-            print(f"  - {pdf}")
+    if incorrect_ids:
+        print(f"❌ Found {len(incorrect_ids)} topic IDs that don't reference Unit 3")
+        return False
     else:
-        print("✓ All expected PDF paths found in HTML")
+        print(f"✅ All topic IDs reference Unit 3 ({len(topic_ids)} IDs checked)")
     
-    print("\nVerification complete!")
+    # Check video URLs
+    video_url_pattern = r'videoUrl:\s*"https://apclassroom\.collegeboard\.org/[^"]+sui=33,(\d+)"'
+    video_urls = re.findall(video_url_pattern, content)
+    incorrect_urls = [url for url in video_urls if url != "3"]
+    
+    if incorrect_urls:
+        print(f"❌ Found {len(incorrect_urls)} video URLs that don't reference Unit 3")
+        return False
+    else:
+        print(f"✅ All video URLs reference Unit 3 ({len(video_urls)} URLs checked)")
+    
+    print("✅ All checks passed! The index.html file is correctly referencing Unit 3.")
+    return True
 
 if __name__ == "__main__":
-    check_unit_references()
+    success = check_references()
+    sys.exit(0 if success else 1)

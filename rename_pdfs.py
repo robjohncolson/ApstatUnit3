@@ -5,23 +5,22 @@ import re
 
 # Define the mapping of topics to their topic numbers
 topic_mapping = {
-    'IntroducingStatisticsAreVariablesRelated': '2.1',
-    'RepresentingTwoCategoricalVariables': '2.2',
-    'StatisticsforTwoCategoricalVariables': '2.3',
-    'RepresentingtheRelationshipBetweenTwoQuantitativeVariables': '2.4',
-    'Correlation': '2.5',
-    'LinearRegressionModels': '2.6',
-    'Residuals': '2.7',
-    'LeastSquaresRegression': '2.8',
-    'AnalyzingDeparturesfromLinearity': '2.9',
-    'Unit2ProgressCheckFRQ': 'unit2_pc_frq',
-    'Unit2ProgressCheckMCQPartA': 'unit2_pc_mcq_parta',
-    'Unit2ProgressCheckMCQPartB': 'unit2_pc_mcq_partb',
+    # Unit 3 Topics
+    'IntroducingStatisticsDotheDataWeCollectedTelltheTruth': '3.1',
+    'IntroductiontoPlanningaStudy': '3.2',
+    'RandomSamplingandDataCollection': '3.3',
+    'PotentialProblemswithSampling': '3.4',
+    'IntroductiontoExperimentalDesign': '3.5',
+    'SelectinganExperimentalDesign': '3.6',
+    'InferenceandExperiments': '3.7',
+    'Unit3ProgressCheckFRQ': 'unit3_pc_frq',
+    'Unit3ProgressCheckMCQPartA': 'unit3_pc_mcq_parta',
+    'Unit3ProgressCheckMCQPartB': 'unit3_pc_mcq_partb',
 }
 
 def rename_pdfs():
-    # Path to the Unit 2 PDFs
-    pdf_dir = 'pdfs/unit2'
+    # Path to the Unit 3 PDFs
+    pdf_dir = 'pdfs/unit3'
     
     # Check if directory exists
     if not os.path.exists(pdf_dir):
