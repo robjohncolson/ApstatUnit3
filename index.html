@@ -724,7 +724,7 @@ Thank you for helping me prepare for my AP Statistics exam!`;
                 topicCardsContainer.classList.add('completed-state');
                 
                 // Find the capstone topic card and highlight it
-                const capstoneCard = document.getElementById(`topic-card-exam-frq2`);
+                const capstoneCard = document.getElementById(`topic-card-3-capstone`);
                 if (capstoneCard) {
                     capstoneCard.classList.add('capstone-highlight');
                 }
@@ -740,7 +740,7 @@ Thank you for helping me prepare for my AP Statistics exam!`;
                 studyMaterialsTab.classList.remove('bg-green-50');
                 
                 // Remove capstone highlight
-                const capstoneCard = document.getElementById(`topic-card-exam-frq2`);
+                const capstoneCard = document.getElementById(`topic-card-3-capstone`);
                 if (capstoneCard) {
                     capstoneCard.classList.remove('capstone-highlight');
                 }
@@ -792,6 +792,8 @@ Thank you for helping me prepare for my AP Statistics exam!`;
         // Function to populate the topic cards
         function populateTopicCards() {
             const container = document.getElementById('topic-cards-container');
+            if (!container) return;
+            
             container.innerHTML = '';
             
             // Find the first incomplete topic
@@ -807,7 +809,98 @@ Thank you for helping me prepare for my AP Statistics exam!`;
             // Populate the cards in the original order (sequential)
             pdfFiles.forEach((topic, index) => {
                 const isNext = index === nextIncompleteIndex;
-                const card = createTopicCard(topic, isNext);
+                
+                // Create card element
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-lg shadow-md mb-4 border ${topic.completed ? 'bg-green-50 border-green-200' : topic.isCapstone ? 'bg-red-50 border-red-200' : isNext ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200'}`;
+                card.id = `topic-card-${topic.id}`;
+                
+                let statusBadge = topic.completed 
+                    ? '<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Completed</span>' 
+                    : topic.isCapstone 
+                        ? '<span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Capstone Challenge</span>'
+                        : isNext
+                            ? '<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Current Focus</span>'
+                            : '<span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full">Upcoming</span>';
+                
+                let statusIcon = '';
+                if (topic.completed) {
+                    statusIcon = '<span class="text-green-500 mr-2">✓</span>';
+                } else if (isNext || topic.current) {
+                    statusIcon = '<span class="text-blue-500 mr-2">→</span>';
+                } else if (topic.isCapstone) {
+                    statusIcon = '<span class="text-red-500 mr-2">🏆</span>';
+                } else {
+                    statusIcon = '<span class="text-gray-300 mr-2">○</span>';
+                }
+                
+                // Generate card content
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="font-bold text-lg">${statusIcon}${topic.name}</h3>
+                        ${statusBadge}
+                    </div>
+                    <p class="text-gray-700 mb-3">${topic.description}</p>
+                    <div class="flex flex-col gap-2">
+                        ${topic.questionPdf ? `
+                        <a href="${topic.questionPdf}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                            ${topic.isCapstone ? "FRQ Questions PDF" : "Download Questions PDF"}
+                        </a>
+                        ` : ''}
+                        ${topic.answersPdf ? `
+                        <a href="${topic.answersPdf}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                            ${topic.isCapstone ? "FRQ Answers PDF" : "Download Answers PDF"}
+                        </a>
+                        ` : ''}
+                        ${topic.questionPdf2 ? `
+                        <a href="${topic.questionPdf2}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                            MCQ Part A PDF
+                        </a>
+                        ` : ''}
+                        ${topic.questionPdf3 ? `
+                        <a href="${topic.questionPdf3}" target="_blank" class="flex items-center text-blue-600 hover:text-blue-800">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                            MCQ Part B PDF
+                        </a>
+                        ` : ''}
+                        
+                        <!-- Video links -->
+                        ${topic.videoUrl ? `
+                        <a href="${topic.videoUrl}" target="_blank" class="flex items-center text-yellow-600 hover:text-yellow-800">
+                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"></path>
+                            </svg>
+                            Watch Topic Video${topic.videoUrl2 || topic.videoUrl3 ? ' 1' : ''}
+                            ${topic.altVideoUrl ? ' (+)' : ''}
+                        </a>
+                        ` : ''}
+                        
+                        <!-- Completed/Completion buttons -->
+                        ${!topic.completed ? `
+                        <button 
+                            onclick="markTopicAsCompleted('${topic.id}')"
+                            class="mt-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded flex items-center justify-center"
+                        >
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Mark as Completed
+                        </button>
+                        ` : ''}
+                    </div>
+                `;
+                
                 container.appendChild(card);
             });
             
@@ -938,27 +1031,38 @@ Thank you for helping me prepare for my AP Statistics exam!`;
             const savedProgress = localStorage.getItem('apStatsTopicProgress');
             
             if (savedProgress) {
-                const progress = JSON.parse(savedProgress);
-                
-                // Update the pdfFiles array with saved progress
-                progress.forEach(savedTopic => {
-                    const topic = pdfFiles.find(t => t.id === savedTopic.id);
-                    if (topic) {
-                        topic.completed = savedTopic.completed;
-                        topic.current = savedTopic.current;
-                        
-                        // Preserve video URLs if they exist
-                        if (savedTopic.videoUrl) {
-                            topic.videoUrl = savedTopic.videoUrl;
-                        }
-                        if (savedTopic.videoUrl2) {
-                            topic.videoUrl2 = savedTopic.videoUrl2;
-                        }
-                        if (savedTopic.videoUrl3) {
-                            topic.videoUrl3 = savedTopic.videoUrl3;
-                        }
+                try {
+                    const progress = JSON.parse(savedProgress);
+                    
+                    // Check if progress is an array before using forEach
+                    if (Array.isArray(progress)) {
+                        // Update the pdfFiles array with saved progress
+                        progress.forEach(savedTopic => {
+                            const topic = pdfFiles.find(t => t.id === savedTopic.id);
+                            if (topic) {
+                                topic.completed = savedTopic.completed;
+                                topic.current = savedTopic.current;
+                                
+                                // Preserve video URLs if they exist
+                                if (savedTopic.videoUrl) {
+                                    topic.videoUrl = savedTopic.videoUrl;
+                                }
+                                if (savedTopic.videoUrl2) {
+                                    topic.videoUrl2 = savedTopic.videoUrl2;
+                                }
+                                if (savedTopic.videoUrl3) {
+                                    topic.videoUrl3 = savedTopic.videoUrl3;
+                                }
+                            }
+                        });
+                    } else {
+                        console.error('Saved progress is not an array, resetting progress');
+                        localStorage.removeItem('apStatsTopicProgress');
                     }
-                });
+                } catch (error) {
+                    console.error('Error parsing saved progress:', error);
+                    localStorage.removeItem('apStatsTopicProgress');
+                }
             }
         }
         
